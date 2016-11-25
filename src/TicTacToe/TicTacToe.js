@@ -9,30 +9,25 @@ function Square(props) {
   );
 }
 
-class Board extends React.Component {
-  renderSquare(i) {
-    return <Square value={this.props.squares[i]} onClick={() => this.props.onClick(i)} />;
+function Board(props) {
+  const board = [[0, 1, 2], [3,4,5], [6,7,8]];
+
+  return (
+    <div className="game-board">
+      {board.map((group, i) => renderRow(group, i))}
+    </div>
+  );
+
+  function renderSquare(i) {
+    return <Square value={props.squares[i]} onClick={() => props.onClick(i)} key={i} />;
   }
-  render() {
+
+  function renderRow(group, i) {
     return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+      <div className="board-row" key={i}>
+        {group.map(v => renderSquare(v))}
       </div>
-    );
+    )
   }
 }
 
@@ -50,7 +45,7 @@ class TicTacToe extends React.Component {
 
   handleClick(i) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length -1];
+    const current = history[history.length - 1];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
@@ -74,11 +69,12 @@ class TicTacToe extends React.Component {
     const history = this.state.history;
 
     const moves = history.map((step, move) => {
+      const active = move === this.state.stepNumber ? 'active' : '';
       const desc = move ?
       'Move #' + move :
       'Game start';
       return (
-        <li key={move}>
+        <li key={move} className={active}>
         <a href="#" onClick={() => this.jumpTo(move)}>{desc}</a>
         </li>
       );
@@ -94,9 +90,7 @@ class TicTacToe extends React.Component {
     }
     return (
       <div className="game">
-        <div className="game-board">
-          <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
-        </div>
+        <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
